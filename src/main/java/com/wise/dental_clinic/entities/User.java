@@ -2,7 +2,7 @@ package com.wise.dental_clinic.entities;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -27,14 +27,18 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime lastLogin;
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant createdAt;
+
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant lastLogin;
+
     private Boolean isActive;
 
     public User() {
     }
 
-    public User(Long id, String name, String cpf, String email, String password, LocalDateTime createdAt, LocalDateTime lastLogin, Boolean isActive) {
+    public User(Long id, String name, String cpf, String email, String password, Instant createdAt, Instant lastLogin, Boolean isActive) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
@@ -85,19 +89,19 @@ public class User {
         this.password = password;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getLastLogin() {
+    public Instant getLastLogin() {
         return lastLogin;
     }
 
-    public void setLastLogin(LocalDateTime lastLogin) {
+    public void setLastLogin(Instant lastLogin) {
         this.lastLogin = lastLogin;
     }
 
