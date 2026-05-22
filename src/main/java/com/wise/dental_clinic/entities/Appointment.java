@@ -14,6 +14,19 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "dentist_id")
+    private Dentist dentist;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(columnDefinition = "TEXT")
@@ -30,9 +43,12 @@ public class Appointment {
     public Appointment() {
     }
 
-    public Appointment(Long id, String description, String cancellationReason, LocalDateTime startTime,
-                       LocalDateTime endTime, Instant bookedAt, AppointmentStatus status) {
+    public Appointment(Long id, Patient patient, Dentist dentist, User user, String description, String cancellationReason,
+                       LocalDateTime startTime, LocalDateTime endTime, Instant bookedAt, AppointmentStatus status) {
         this.id = id;
+        this.patient = patient;
+        this.dentist = dentist;
+        this.user = user;
         this.description = description;
         this.cancellationReason = cancellationReason;
         this.startTime = startTime;
@@ -47,6 +63,30 @@ public class Appointment {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public Dentist getDentist() {
+        return dentist;
+    }
+
+    public void setDentist(Dentist dentist) {
+        this.dentist = dentist;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getDescription() {
