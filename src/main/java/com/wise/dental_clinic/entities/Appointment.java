@@ -38,6 +38,7 @@ public class Appointment {
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant bookedAt;
 
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
     public Appointment() {
