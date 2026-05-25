@@ -32,7 +32,6 @@ public class UserService {
     @Transactional
     public UserDTO save(UserDTO dto) {
         User user = new User();
-        user.setId(dto.getId());
         user.setName(dto.getName());
         user.setCpf(dto.getCpf());
         user.setEmail(dto.getEmail());
@@ -44,10 +43,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO update(UserDTO dto) {
-        Optional<User> result = repository.findById(dto.getId());
+    public UserDTO update(UserDTO dto, Long id) {
+        Optional<User> result = repository.findById(id);
         User user = result.orElseThrow();
-        user.setId(dto.getId());
         user.setName(dto.getName());
         user.setCpf(dto.getCpf());
         user.setEmail(dto.getEmail());
