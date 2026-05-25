@@ -31,33 +31,31 @@ public class UserService {
 
     @Transactional
     public UserDTO save(UserDTO dto) {
-        User user = new User();
-        user.setName(dto.getName());
-        user.setCpf(dto.getCpf());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setCreatedAt(dto.getCreatedAt());
-        user.setLastLogin(dto.getLastLogin());
-        user.setActive(dto.getActive());
-        return new UserDTO(repository.save(user));
+        User entity = new User();
+        dtoToEntity(entity, dto);
+        return new UserDTO(repository.save(entity));
     }
 
     @Transactional
     public UserDTO update(UserDTO dto, Long id) {
         Optional<User> result = repository.findById(id);
-        User user = result.orElseThrow();
-        user.setName(dto.getName());
-        user.setCpf(dto.getCpf());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setCreatedAt(dto.getCreatedAt());
-        user.setLastLogin(dto.getLastLogin());
-        user.setActive(dto.getActive());
-        return new UserDTO(user);
+        User entity = result.orElseThrow();
+        dtoToEntity(entity, dto);
+        return new UserDTO(entity);
     }
 
     @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    private void dtoToEntity(User entity, UserDTO dto) {
+        entity.setName(dto.getName());
+        entity.setCpf(dto.getCpf());
+        entity.setEmail(dto.getEmail());
+        entity.setPassword(dto.getPassword());
+        entity.setCreatedAt(dto.getCreatedAt());
+        entity.setLastLogin(dto.getLastLogin());
+        entity.setActive(dto.getActive());
     }
  }
