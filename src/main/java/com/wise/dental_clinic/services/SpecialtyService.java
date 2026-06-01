@@ -34,7 +34,7 @@ public class SpecialtyService {
     @Transactional
     public SpecialtyDTO insert(SpecialtyDTO dto) {
         Specialty entity = new Specialty();
-        entity.setName(dto.getName());
+        dtoToEntity(entity, dto);
         return new SpecialtyDTO(entity);
     }
 
@@ -42,12 +42,17 @@ public class SpecialtyService {
     public SpecialtyDTO update(SpecialtyDTO dto, Long id) {
         Optional<Specialty> result = repository.findById(id);
         Specialty entity = result.orElseThrow();
-        entity.setName(dto.getName());
+        dtoToEntity(entity, dto);
         return new SpecialtyDTO(entity);
     }
 
     @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    private void dtoToEntity(Specialty entity, SpecialtyDTO dto) {
+        entity.setName(dto.getName());
+        repository.save(entity);
     }
 }
