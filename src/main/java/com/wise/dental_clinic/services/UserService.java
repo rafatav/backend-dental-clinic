@@ -32,7 +32,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO save(UserDTO dto) {
+    public UserDTO insert(UserDTO dto) {
         User entity = new User();
         dtoToEntity(entity, dto);
         return new UserDTO(repository.save(entity));
