@@ -3,7 +3,6 @@ package com.wise.dental_clinic.services;
 import com.wise.dental_clinic.dto.UserDTO;
 import com.wise.dental_clinic.entities.User;
 import com.wise.dental_clinic.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +12,11 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
 
     @Transactional(readOnly = true)
     public List<UserDTO> findAll() {
