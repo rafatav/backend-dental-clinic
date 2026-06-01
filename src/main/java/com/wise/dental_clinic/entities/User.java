@@ -38,12 +38,12 @@ public class User {
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant lastLogin;
 
-    private Boolean isActive;
+    private Boolean active;
 
     public User() {
     }
 
-    public User(Long id, String name, String cpf, String email, String password, Instant createdAt, Instant lastLogin, Boolean isActive) {
+    public User(Long id, String name, String cpf, String email, String password, Instant createdAt, Instant lastLogin, Boolean active) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
@@ -51,7 +51,7 @@ public class User {
         this.password = password;
         this.createdAt = createdAt;
         this.lastLogin = lastLogin;
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public Long getId() {
@@ -111,11 +111,11 @@ public class User {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     @Override

@@ -36,19 +36,19 @@ public class Dentist {
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant createdAt;
 
-    private Boolean isActive;
+    private Boolean active;
 
     public Dentist() {
     }
 
-    public Dentist(Long id, String name, String cpf, String email, String cro, Instant createdAt, Boolean isActive) {
+    public Dentist(Long id, String name, String cpf, String email, String cro, Instant createdAt, Boolean active) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
         this.email = email;
         this.cro = cro;
         this.createdAt = createdAt;
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public Long getId() {
@@ -100,11 +100,11 @@ public class Dentist {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     @Override

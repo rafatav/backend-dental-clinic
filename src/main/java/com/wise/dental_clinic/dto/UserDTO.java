@@ -13,12 +13,12 @@ public class UserDTO {
     private String password;
     private Instant createdAt;
     private Instant lastLogin;
-    private Boolean isActive;
+    private Boolean active;
 
     public UserDTO() {
     }
 
-    public UserDTO(Long id, String name, String cpf, String email, String password, Instant createdAt, Instant lastLogin, Boolean isActive) {
+    public UserDTO(Long id, String name, String cpf, String email, String password, Instant createdAt, Instant lastLogin, Boolean active) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
@@ -26,7 +26,7 @@ public class UserDTO {
         this.password = password;
         this.createdAt = createdAt;
         this.lastLogin = lastLogin;
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public UserDTO(User entity) {
@@ -37,7 +37,7 @@ public class UserDTO {
         this.password = entity.getPassword();
         this.createdAt = entity.getCreatedAt();
         this.lastLogin = entity.getLastLogin();
-        this.isActive = entity.getActive();
+        this.active = entity.getActive();
     }
 
     public Long getId() {
@@ -69,6 +69,6 @@ public class UserDTO {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 }
