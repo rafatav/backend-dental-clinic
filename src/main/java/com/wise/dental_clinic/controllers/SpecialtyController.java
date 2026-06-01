@@ -1,7 +1,7 @@
 package com.wise.dental_clinic.controllers;
 
-import com.wise.dental_clinic.dto.UserDTO;
-import com.wise.dental_clinic.services.UserService;
+import com.wise.dental_clinic.dto.SpecialtyDTO;
+import com.wise.dental_clinic.services.SpecialtyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,38 +17,38 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/users")
-public class UserController {
+@RequestMapping(value = "/specialties")
+public class SpecialtyController {
 
-    private final UserService service;
+    private final SpecialtyService service;
 
-    public UserController(UserService service) {
+    public SpecialtyController(SpecialtyService service) {
         this.service = service;
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> findAll() {
-        List<UserDTO> dto = service.findAll();
+    public ResponseEntity<List<SpecialtyDTO>> findAll() {
+        List<SpecialtyDTO> dto = service.findAll();
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
-        UserDTO dto = service.findById(id);
+    public ResponseEntity<SpecialtyDTO> findById(@PathVariable Long id) {
+        SpecialtyDTO dto = service.findById(id);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> insert(@RequestBody UserDTO dto) {
+    public ResponseEntity<SpecialtyDTO> insert(@RequestBody SpecialtyDTO dto) {
         dto = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@RequestBody UserDTO dto, @PathVariable Long id) {
+    public ResponseEntity<SpecialtyDTO> update(@RequestBody SpecialtyDTO dto, @PathVariable Long id) {
         dto = service.update(dto, id);
-        return ResponseEntity.ok().body(dto);
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping(value = "/{id}")
