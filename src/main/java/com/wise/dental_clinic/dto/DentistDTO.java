@@ -12,19 +12,19 @@ public class DentistDTO {
     private String email;
     private String cro;
     private Instant createdAt;
-    private Boolean isActive;
+    private Boolean active;
 
     public DentistDTO() {
     }
 
-    public DentistDTO(Long id, String name, String cpf, String email, String cro, Instant createdAt, Boolean isActive) {
+    public DentistDTO(Long id, String name, String cpf, String email, String cro, Instant createdAt, Boolean active) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
         this.email = email;
         this.cro = cro;
         this.createdAt = createdAt;
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public DentistDTO(Dentist entity) {
@@ -34,7 +34,7 @@ public class DentistDTO {
         this.email = entity.getEmail();
         this.cro = entity.getCro();
         this.createdAt = entity.getCreatedAt();
-        this.isActive = entity.getActive();
+        this.active = entity.getActive();
     }
 
     public Long getId() {
@@ -62,6 +62,6 @@ public class DentistDTO {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 }
