@@ -2,7 +2,6 @@ package com.wise.dental_clinic.controllers;
 
 import com.wise.dental_clinic.dto.UserDTO;
 import com.wise.dental_clinic.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -14,8 +13,11 @@ import java.util.List;
 @RequestMapping(value = "/users")
 public class UserController {
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
