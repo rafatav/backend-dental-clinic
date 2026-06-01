@@ -14,7 +14,7 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    UserRepository repository;
+    private UserRepository repository;
 
     @Transactional(readOnly = true)
     public List<UserDTO> findAll() {
