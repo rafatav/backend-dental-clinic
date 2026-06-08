@@ -3,10 +3,15 @@ package com.wise.dental_clinic.services;
 import com.wise.dental_clinic.dto.UserDTO;
 import com.wise.dental_clinic.entities.User;
 import com.wise.dental_clinic.repositories.UserRepository;
+import com.wise.dental_clinic.services.exceptions.DatabaseException;
+import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -27,7 +32,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDTO findById(Long id) {
         Optional<User> result = repository.findById(id);
-        User user = result.orElseThrow();
+        User user = result.orElseThrow(() ->new ResourceNotFoundException("Recurso não encontrado"));
         return new UserDTO(user);
     }
 
@@ -40,15 +45,26 @@ public class UserService {
 
     @Transactional
     public UserDTO update(UserDTO dto, Long id) {
-        Optional<User> result = repository.findById(id);
-        User entity = result.orElseThrow();
-        dtoToEntity(entity, dto);
-        return new UserDTO(entity);
+        try {
+            Optional<User> result = repository.findById(id);
+            User entity = result.orElseThrow();
+            dtoToEntity(entity, dto);
+            return new UserDTO(entity);
+        } catch (NoSuchElementException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
-        repository.deleteById(id);
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+        try {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 
     private void dtoToEntity(User entity, UserDTO dto) {
@@ -60,4 +76,4 @@ public class UserService {
         entity.setLastLogin(dto.getLastLogin());
         entity.setActive(dto.getActive());
     }
- }
+}
