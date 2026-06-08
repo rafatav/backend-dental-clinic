@@ -9,10 +9,15 @@ import com.wise.dental_clinic.repositories.AppointmentRepository;
 import com.wise.dental_clinic.repositories.DentistRepository;
 import com.wise.dental_clinic.repositories.PatientRepository;
 import com.wise.dental_clinic.repositories.UserRepository;
+import com.wise.dental_clinic.services.exceptions.DatabaseException;
+import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -46,7 +51,7 @@ public class AppointmentService {
     @Transactional(readOnly = true)
     public AppointmentDTO findById(Long id) {
         Optional<Appointment> result = repository.findById(id);
-        Appointment appointment = result.orElseThrow();
+        Appointment appointment = result.orElseThrow(() -> new ResourceNotFoundException("Recurso não encontrado"));
         return new AppointmentDTO(appointment);
     }
 
@@ -59,15 +64,26 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO update(AppointmentDTO dto, Long id) {
-        Optional<Appointment> result = repository.findById(id);
-        Appointment entity = result.orElseThrow();
-        dtoToEntity(entity, dto);
-        return new AppointmentDTO(entity);
+        try {
+            Optional<Appointment> result = repository.findById(id);
+            Appointment entity = result.orElseThrow();
+            dtoToEntity(entity, dto);
+            return new AppointmentDTO(entity);
+        } catch (NoSuchElementException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
-        repository.deleteById(id);
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+        try {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 
     private void dtoToEntity(Appointment entity, AppointmentDTO dto) {
