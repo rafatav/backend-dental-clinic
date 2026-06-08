@@ -3,10 +3,15 @@ package com.wise.dental_clinic.services;
 import com.wise.dental_clinic.dto.SpecialtyDTO;
 import com.wise.dental_clinic.entities.Specialty;
 import com.wise.dental_clinic.repositories.SpecialtyRepository;
+import com.wise.dental_clinic.services.exceptions.DatabaseException;
+import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -27,7 +32,7 @@ public class SpecialtyService {
     @Transactional(readOnly = true)
     public SpecialtyDTO findById(Long id) {
         Optional<Specialty> result = repository.findById(id);
-        Specialty patient = result.orElseThrow();
+        Specialty patient = result.orElseThrow(() -> new ResourceNotFoundException("Recurso não encontrado"));
         return new SpecialtyDTO(patient);
     }
 
@@ -40,15 +45,27 @@ public class SpecialtyService {
 
     @Transactional
     public SpecialtyDTO update(SpecialtyDTO dto, Long id) {
-        Optional<Specialty> result = repository.findById(id);
-        Specialty entity = result.orElseThrow();
-        dtoToEntity(entity, dto);
-        return new SpecialtyDTO(entity);
+        try {
+            Optional<Specialty> result = repository.findById(id);
+            Specialty entity = result.orElseThrow();
+            dtoToEntity(entity, dto);
+            return new SpecialtyDTO(entity);
+        } catch (NoSuchElementException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
-        repository.deleteById(id);
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+        try {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 
     private void dtoToEntity(Specialty entity, SpecialtyDTO dto) {
