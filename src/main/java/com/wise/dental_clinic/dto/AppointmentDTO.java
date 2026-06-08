@@ -2,6 +2,7 @@ package com.wise.dental_clinic.dto;
 
 import com.wise.dental_clinic.entities.Appointment;
 import com.wise.dental_clinic.entities.AppointmentStatus;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -12,7 +13,11 @@ public class AppointmentDTO {
     private PatientDTO patient;
     private DentistDTO dentist;
     private UserDTO user;
+
+    @NotBlank(message = "Campo obrigatório")
     private String description;
+
+
     private String cancellationReason;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

@@ -2,6 +2,7 @@ package com.wise.dental_clinic.controllers;
 
 import com.wise.dental_clinic.dto.AppointmentDTO;
 import com.wise.dental_clinic.services.AppointmentService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,14 +40,14 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<AppointmentDTO> insert(@RequestBody AppointmentDTO dto) {
+    public ResponseEntity<AppointmentDTO> insert(@Valid @RequestBody AppointmentDTO dto) {
         dto = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<AppointmentDTO> update(@RequestBody AppointmentDTO dto, @PathVariable Long id) {
+    public ResponseEntity<AppointmentDTO> update(@Valid @RequestBody AppointmentDTO dto, @PathVariable Long id) {
         dto = service.update(dto, id);
         return ResponseEntity.ok(dto);
     }

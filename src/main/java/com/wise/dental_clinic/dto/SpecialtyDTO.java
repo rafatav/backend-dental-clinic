@@ -1,10 +1,13 @@
 package com.wise.dental_clinic.dto;
 
 import com.wise.dental_clinic.entities.Specialty;
+import jakarta.validation.constraints.NotBlank;
 
 public class SpecialtyDTO {
 
     private Long id;
+
+    @NotBlank(message = "Campo requerido")
     private String name;
 
     public SpecialtyDTO() {

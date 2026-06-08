@@ -1,16 +1,28 @@
 package com.wise.dental_clinic.dto;
 
 import com.wise.dental_clinic.entities.Dentist;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
 
 public class DentistDTO {
 
     private Long id;
+
+    @NotBlank(message = "Campo requerido")
     private String name;
+
+    @NotBlank(message = "Campo requerido")
     private String cpf;
+
+    @NotBlank(message = "Campo requerido")
+    @Email(message = "Forneça um email válido")
     private String email;
+
+    @NotBlank(message = "Campo requerido")
     private String cro;
+
     private Instant createdAt;
     private Boolean active;
 
