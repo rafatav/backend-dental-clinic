@@ -2,6 +2,8 @@ package com.wise.dental_clinic.dto;
 
 import com.wise.dental_clinic.entities.Appointment;
 import com.wise.dental_clinic.entities.AppointmentStatus;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
@@ -17,10 +19,14 @@ public class AppointmentDTO {
     @NotBlank(message = "Campo obrigatório")
     private String description;
 
-
     private String cancellationReason;
+
+    @FutureOrPresent(message = "Agendamento permitido apenas para datas futuras")
     private LocalDateTime startTime;
+
+    @Future(message = "Agendamento permitido apenas para datas futuras")
     private LocalDateTime endTime;
+
     private Instant bookedAt;
     private AppointmentStatus status;
 
