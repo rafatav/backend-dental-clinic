@@ -38,9 +38,13 @@ public class DentistService {
 
     @Transactional
     public DentistDTO insert(DentistDTO dto) {
-        Dentist entity = new Dentist();
-        entityToDto(entity, dto);
-        return new DentistDTO(entity);
+        try {
+            Dentist entity = new Dentist();
+            entityToDto(entity, dto);
+            return new DentistDTO(entity);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha nos dados");
+        }
     }
 
     @Transactional
@@ -52,6 +56,8 @@ public class DentistService {
             return new DentistDTO(entity);
         } catch (NoSuchElementException e)  {
             throw new ResourceNotFoundException("Recurso não encontrado");
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha nos dados");
         }
     }
 
