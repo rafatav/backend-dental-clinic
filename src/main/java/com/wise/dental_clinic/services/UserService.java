@@ -38,9 +38,13 @@ public class UserService {
 
     @Transactional
     public UserDTO insert(UserDTO dto) {
-        User entity = new User();
-        dtoToEntity(entity, dto);
-        return new UserDTO(repository.save(entity));
+        try {
+            User entity = new User();
+            dtoToEntity(entity, dto);
+            return new UserDTO(repository.save(entity));
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha nos dados");
+        }
     }
 
     @Transactional
@@ -52,6 +56,8 @@ public class UserService {
             return new UserDTO(entity);
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Recurso não encontrado");
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha nos dados");
         }
     }
 

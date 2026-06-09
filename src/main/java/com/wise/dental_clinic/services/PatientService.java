@@ -38,9 +38,13 @@ public class PatientService {
 
     @Transactional
     public PatientDTO insert(PatientDTO dto) {
-        Patient entity = new Patient();
-        entityToDto(entity, dto);
-        return new PatientDTO(entity);
+        try {
+            Patient entity = new Patient();
+            entityToDto(entity, dto);
+            return new PatientDTO(entity);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha nos dados");
+        }
     }
 
     @Transactional
@@ -52,6 +56,8 @@ public class PatientService {
             return new PatientDTO(entity);
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Recurso não encontrado");
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha nos dados");
         }
     }
 

@@ -2,6 +2,7 @@ package com.wise.dental_clinic.controllers;
 
 import com.wise.dental_clinic.dto.PatientDTO;
 import com.wise.dental_clinic.services.PatientService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,14 +40,14 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<PatientDTO> insert(@RequestBody PatientDTO dto) {
+    public ResponseEntity<PatientDTO> insert(@Valid @RequestBody PatientDTO dto) {
         dto = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<PatientDTO> update(@RequestBody PatientDTO dto, @PathVariable Long id) {
+    public ResponseEntity<PatientDTO> update(@Valid @RequestBody PatientDTO dto, @PathVariable Long id) {
         dto = service.update(dto, id);
         return ResponseEntity.ok(dto);
     }
