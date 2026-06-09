@@ -1,11 +1,16 @@
 package com.wise.dental_clinic.services;
 
 import com.wise.dental_clinic.dto.UserDTO;
+import com.wise.dental_clinic.entities.Role;
 import com.wise.dental_clinic.entities.User;
+import com.wise.dental_clinic.projections.UserDetailsProjection;
 import com.wise.dental_clinic.repositories.UserRepository;
 import com.wise.dental_clinic.services.exceptions.DatabaseException;
 import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository repository;
 
@@ -81,5 +86,24 @@ public class UserService {
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setLastLogin(dto.getLastLogin());
         entity.setActive(dto.getActive());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        List<UserDetailsProjection> result = repository.searchUserAndRolesByEmail(username);
+
+        if (result.isEmpty()) {
+            throw new UsernameNotFoundException("Usuário não encontrado");
+        }
+
+        User user = new User();
+        user.setEmail(result.getFirst().getUsername());
+        user.setPassword(result.getFirst().getPassword());
+
+        for (UserDetailsProjection projection : result) {
+            user.addRoles(new Role(projection.getRoleId(), projection.getAuthority()));
+        }
+
+        return user;
     }
 }
