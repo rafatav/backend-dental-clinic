@@ -19,3 +19,8 @@ INSERT INTO dentist_specialties (dentist_id, specialty_id) VALUES (3, 2);
 
 INSERT INTO appointments (patient_id, dentist_id, user_id, description, cancellation_reason, start_time, end_time, booked_at, status) VALUES (2, 1, 2, 'Manutenção de canal', null, '2026-06-20 14:00:00', '2026-06-20 15:00:00', '2026-05-18 12:02:30', 'SCHEDULED');
 
+INSERT INTO roles (authority) VALUES ('ROLE_ADMIN');
+INSERT INTO roles (authority) VALUES ('ROLE_DENTIST');
+
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 1)
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 2)
