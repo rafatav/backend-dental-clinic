@@ -4,6 +4,7 @@ import com.wise.dental_clinic.dto.UserDTO;
 import com.wise.dental_clinic.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,18 +28,21 @@ public class UserController {
         this.service = service;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
         List<UserDTO> dto = service.findAll();
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
         UserDTO dto = service.findById(id);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserDTO dto) {
         dto = service.insert(dto);
@@ -46,12 +50,14 @@ public class UserController {
         return ResponseEntity.created(uri).body(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO> update(@Valid @RequestBody UserDTO dto, @PathVariable Long id) {
         dto = service.update(dto, id);
         return ResponseEntity.ok().body(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

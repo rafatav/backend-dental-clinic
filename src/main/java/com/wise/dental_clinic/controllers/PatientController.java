@@ -4,6 +4,7 @@ import com.wise.dental_clinic.dto.PatientDTO;
 import com.wise.dental_clinic.services.PatientService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,18 +28,21 @@ public class PatientController {
         this.service = service;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
     @GetMapping
     public ResponseEntity<List<PatientDTO>> findAll() {
         List<PatientDTO> dto = service.findAll();
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
     @GetMapping(value = "/{id}")
     public ResponseEntity<PatientDTO> findById(@PathVariable Long id) {
         PatientDTO dto = service.findById(id);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
     @PostMapping
     public ResponseEntity<PatientDTO> insert(@Valid @RequestBody PatientDTO dto) {
         dto = service.insert(dto);
@@ -46,12 +50,14 @@ public class PatientController {
         return ResponseEntity.created(uri).body(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<PatientDTO> update(@Valid @RequestBody PatientDTO dto, @PathVariable Long id) {
         dto = service.update(dto, id);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
