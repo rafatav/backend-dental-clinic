@@ -1,5 +1,5 @@
-INSERT INTO users (name, cpf, email, password, created_at, last_login, active) VALUES ('Rafael', '06161999999', 'rafael@teste.com', '123456', '2026-02-11 13:04:40', null, true);
-INSERT INTO users (name, cpf, email, password, created_at, last_login, active) VALUES ('Alice', '06161888888', 'alice@teste.com', '123456', '2026-04-21 13:01:20', null, true);
+INSERT INTO users (name, cpf, email, password, created_at, last_login, active) VALUES ('Rafael', '06161999999', 'rafael@teste.com', '$2a$10$GH6g5uES7h8SuZ7SNq5tcOJRilsyIi0Aq6/Z4IIezUIWzzeNma0vi', '2026-02-11 13:04:40', null, true);
+INSERT INTO users (name, cpf, email, password, created_at, last_login, active) VALUES ('Alice', '06161888888', 'alice@teste.com', '$2a$10$GH6g5uES7h8SuZ7SNq5tcOJRilsyIi0Aq6/Z4IIezUIWzzeNma0vi', '2026-04-21 13:01:20', null, true);
 
 INSERT INTO specialties (name) VALUES ('Emergência');
 INSERT INTO specialties (name) VALUES ('Limpeza');
@@ -24,3 +24,4 @@ INSERT INTO roles (authority) VALUES ('ROLE_DENTIST');
 
 INSERT INTO user_roles (user_id, role_id) VALUES (1, 1)
 INSERT INTO user_roles (user_id, role_id) VALUES (1, 2)
+INSERT INTO user_roles (user_id, role_id) VALUES (2, 2)
