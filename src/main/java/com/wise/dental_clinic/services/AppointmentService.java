@@ -24,22 +24,16 @@ import java.util.Optional;
 public class AppointmentService {
 
     private final AppointmentRepository repository;
-    private final PatientService patientService;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
     private final DentistRepository dentistRepository;
-    private final UserService userService;
-    private final DentistService dentistService;
 
     public AppointmentService(AppointmentRepository repository, PatientService patientService, PatientRepository patientRepository, UserService userService,
                               DentistService dentistService, UserRepository userRepository, DentistRepository dentistRepository) {
         this.repository = repository;
-        this.patientService = patientService;
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.dentistRepository = dentistRepository;
-        this.userService = userService;
-        this.dentistService = dentistService;
     }
 
     @Transactional(readOnly = true)
@@ -57,6 +51,14 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO insert(AppointmentDTO dto) {
+        boolean hasConflict = repository.existsConflictingAppointment(
+                dto.getDentist().getId(),
+                dto.getStartTime(),
+                dto.getEndTime()
+        );
+        if (hasConflict) {
+            throw new IllegalArgumentException("O dentista já possui uma consulta marcada neste horário.");
+        }
         Appointment entity = new Appointment();
         dtoToEntity(entity, dto);
         return new AppointmentDTO(repository.save(entity));
@@ -87,9 +89,9 @@ public class AppointmentService {
     }
 
     private void dtoToEntity(Appointment entity, AppointmentDTO dto) {
-        Patient patient = patientRepository.findById(dto.getPatient().getId()).get();
-        Dentist dentist = dentistRepository.findById(dto.getDentist().getId()).get();
-        User user = userRepository.findById(dto.getUser().getId()).get();
+        Patient patient = patientRepository.getReferenceById(dto.getPatient().getId());
+        Dentist dentist = dentistRepository.getReferenceById(dto.getDentist().getId());
+        User user = userRepository.getReferenceById(dto.getUser().getId());
         entity.setPatient(patient);
         entity.setDentist(dentist);
         entity.setUser(user);
