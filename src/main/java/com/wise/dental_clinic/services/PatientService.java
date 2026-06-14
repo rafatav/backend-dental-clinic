@@ -24,8 +24,13 @@ public class PatientService {
     }
 
     @Transactional(readOnly = true)
-    public List<PatientDTO> findAll() {
-        List<Patient> result = repository.findAll();
+    public List<PatientDTO> findAll(String name) {
+        List<Patient> result;
+        if (name == null || name.isBlank()) {
+            result = repository.findAll();
+        } else {
+            result = repository.findByNameContainingIgnoreCase(name);
+        }
         return result.stream().map(PatientDTO::new).toList();
     }
 
