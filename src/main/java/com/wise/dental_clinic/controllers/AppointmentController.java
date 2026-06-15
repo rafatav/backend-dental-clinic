@@ -3,6 +3,8 @@ package com.wise.dental_clinic.controllers;
 import com.wise.dental_clinic.dto.AppointmentDTO;
 import com.wise.dental_clinic.services.AppointmentService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,11 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "appointments")
@@ -30,8 +32,8 @@ public class AppointmentController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
     @GetMapping
-    public ResponseEntity<List<AppointmentDTO>> findAll() {
-        List<AppointmentDTO> dto = service.findAll();
+    public ResponseEntity<org.springframework.data.domain.Page<AppointmentDTO>> findAll(@RequestParam(value = "name", required = false) String name, Pageable pageable) {
+        Page<AppointmentDTO> dto = service.findAll(name, pageable);
         return ResponseEntity.ok(dto);
     }
 

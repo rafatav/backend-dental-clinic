@@ -2,6 +2,8 @@ package com.wise.dental_clinic.repositories;
 
 import com.wise.dental_clinic.entities.User;
 import com.wise.dental_clinic.projections.UserDetailsProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,5 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			WHERE users.email = :email
 		""")
     List<UserDetailsProjection> searchUserAndRolesByEmail(String email);
+
+    Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
 }
