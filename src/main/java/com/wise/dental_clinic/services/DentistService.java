@@ -6,11 +6,12 @@ import com.wise.dental_clinic.repositories.DentistRepository;
 import com.wise.dental_clinic.services.exceptions.DatabaseException;
 import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -24,9 +25,14 @@ public class DentistService {
     }
 
     @Transactional(readOnly = true)
-    public List<DentistDTO> findAll() {
-        List<Dentist> result = repository.findAll();
-        return result.stream().map(DentistDTO::new).toList();
+    public Page<DentistDTO> findAll(String name, Pageable pageable) {
+        Page<Dentist> result;
+        if (name == null || name.isBlank()) {
+            result = repository.findAll(pageable);
+        } else {
+            result = repository.findByNameContainingIgnoreCase(name, pageable);
+        }
+        return result.map(DentistDTO::new);
     }
 
     @Transactional(readOnly = true)

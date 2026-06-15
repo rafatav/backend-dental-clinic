@@ -8,6 +8,8 @@ import com.wise.dental_clinic.repositories.UserRepository;
 import com.wise.dental_clinic.services.exceptions.DatabaseException;
 import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,9 +31,14 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> findAll() {
-        List<User> result = repository.findAll();
-        return result.stream().map(UserDTO::new).toList();
+    public Page<UserDTO> findAll(String name, Pageable pageable) {
+        Page<User> result;
+        if (name == null || name.isBlank()) {
+            result = repository.findAll(pageable);
+        } else {
+            result = repository.findByNameContainingIgnoreCase(name, pageable);
+        }
+        return result.map(UserDTO::new);
     }
 
     @Transactional(readOnly = true)
