@@ -43,11 +43,29 @@ public class AppointmentService {
 
     @Transactional(readOnly = true)
     public Page<AppointmentDTO> findAll(String name, Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String loggedUsername = jwt.getClaimAsString("username");
+
+        User loggedUser = userRepository.findByEmail(loggedUsername).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        boolean isAdmin = loggedUser.getRoles().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
         Page<Appointment> result;
-        if (name == null || name.isBlank()) {
-            result = repository.findAll(pageable);
+
+        if (isAdmin) {
+            if (name == null || name.isBlank()) {
+                result = repository.findAll(pageable);
+            } else {
+                result = repository.findByPatient_NameContainingIgnoreCase(name, pageable);
+            }
         } else {
-            result = repository.findByPatient_NameContainingIgnoreCase(name, pageable);
+            if (name == null || name.isBlank()) {
+                result = repository.findByUser(loggedUser, pageable);
+            } else {
+                result = repository.findByPatient_NameContainingIgnoreCaseAndUser(name, loggedUser, pageable);
+            }
         }
         return result.map(AppointmentDTO::new);
     }
@@ -61,6 +79,7 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO insert(AppointmentDTO dto) {
+        validateAppointmentTimes(dto.getStartTime(), dto.getEndTime());
         boolean hasConflict = repository.existsConflictingAppointment(
                 dto.getDentist().getId(),
                 dto.getStartTime(),
@@ -76,11 +95,12 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO update(AppointmentDTO dto, Long id) {
+        validateAppointmentTimes(dto.getStartTime(), dto.getEndTime());
         try {
             Optional<Appointment> result = repository.findById(id);
             Appointment entity = result.orElseThrow();
             dtoToEntity(entity, dto);
-            return new AppointmentDTO(entity);
+            return new AppointmentDTO(repository.save(entity));
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Recurso não encontrado");
         }
@@ -127,5 +147,11 @@ public class AppointmentService {
         entity.setEndTime(dto.getEndTime());
         entity.setBookedAt(dto.getBookedAt());
         entity.setStatus(dto.getStatus());
+    }
+
+    private void validateAppointmentTimes(java.time.LocalDateTime start, java.time.LocalDateTime end) {
+        if (start != null && end != null && !end.isAfter(start)) {
+            throw new IllegalArgumentException("Atenção: O horário final da consulta deve ser após o horário inicial.");
+        }
     }
 }
