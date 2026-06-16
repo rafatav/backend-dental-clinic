@@ -2,6 +2,7 @@ package com.wise.dental_clinic.services;
 
 import com.wise.dental_clinic.dto.AppointmentDTO;
 import com.wise.dental_clinic.entities.Appointment;
+import com.wise.dental_clinic.entities.AppointmentStatus;
 import com.wise.dental_clinic.entities.Dentist;
 import com.wise.dental_clinic.entities.Patient;
 import com.wise.dental_clinic.entities.User;
@@ -14,6 +15,9 @@ import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,10 +98,26 @@ public class AppointmentService {
         }
     }
 
+    @Transactional
+    public void cancelAppointment(Long id, String cancellationReason) {
+        Appointment entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Consulta não encontrada"));
+        if (entity.getStatus() == AppointmentStatus.CANCELLED) {
+            throw new IllegalArgumentException("Esta consulta já está cancelada.");
+        }
+        entity.setStatus(AppointmentStatus.CANCELLED);
+        entity.setCancellationReason(cancellationReason);
+        repository.save(entity);
+    }
+
     private void dtoToEntity(Appointment entity, AppointmentDTO dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String loggedUsername = jwt.getClaimAsString("username");
+
         Patient patient = patientRepository.getReferenceById(dto.getPatient().getId());
         Dentist dentist = dentistRepository.getReferenceById(dto.getDentist().getId());
-        User user = userRepository.getReferenceById(dto.getUser().getId());
+        User user = userRepository.findByEmail(loggedUsername).orElseThrow(() -> new ResourceNotFoundException("Usuário logado não encontrado no banco"));
+
         entity.setPatient(patient);
         entity.setDentist(dentist);
         entity.setUser(user);
