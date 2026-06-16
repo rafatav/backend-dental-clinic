@@ -132,6 +132,10 @@ public class User implements UserDetails {
         this.active = active;
     }
 
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
     public void addRoles(Role role) {
         this.roles.add(role);
     }

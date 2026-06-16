@@ -1,5 +1,6 @@
 package com.wise.dental_clinic.services;
 
+import com.wise.dental_clinic.dto.RoleDTO;
 import com.wise.dental_clinic.dto.UserDTO;
 import com.wise.dental_clinic.entities.Role;
 import com.wise.dental_clinic.entities.User;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +27,11 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -89,10 +93,13 @@ public class UserService implements UserDetailsService {
         entity.setName(dto.getName());
         entity.setCpf(dto.getCpf());
         entity.setEmail(dto.getEmail());
-        entity.setPassword(dto.getPassword());
+        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setLastLogin(dto.getLastLogin());
         entity.setActive(dto.getActive());
+        for (RoleDTO role : dto.getRoles()) {
+            entity.addRoles(new Role(role.getId(), role.getAuthority()));
+        }
     }
 
     @Override
