@@ -1,9 +1,12 @@
 package com.wise.dental_clinic.config.customgrant;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.wise.dental_clinic.entities.User;
+import com.wise.dental_clinic.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -38,19 +41,22 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 	private final UserDetailsService userDetailsService;
 	private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
 	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
 	public CustomPasswordAuthenticationProvider(OAuth2AuthorizationService authorizationService,
 			OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator, 
-			UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+			UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserRepository userRepository) {
 		
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
 		Assert.notNull(tokenGenerator, "TokenGenerator cannot be null");
 		Assert.notNull(userDetailsService, "UserDetailsService cannot be null");
 		Assert.notNull(passwordEncoder, "PasswordEncoder cannot be null");
+        Assert.notNull(userRepository, "UserRepository cannot be null");
 		this.authorizationService = authorizationService;
 		this.tokenGenerator = tokenGenerator;
 		this.userDetailsService = userDetailsService;
 		this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
 	}
 	
 	@Override
@@ -72,6 +78,12 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		if (!passwordEncoder.matches(password, user.getPassword()) || !user.getUsername().equals(username)) {
 			throw new OAuth2AuthenticationException("Invalid credentials");
 		}
+
+        User entityUser = userRepository.findByEmail(username)
+                .orElseThrow(() -> new OAuth2AuthenticationException("User not found in DB"));
+
+        entityUser.setLastLogin(Instant.now());
+        userRepository.save(entityUser);
 
 		Set<String> authorizedScopes = user.getAuthorities().stream()
 				.map(scope -> scope.getAuthority())
