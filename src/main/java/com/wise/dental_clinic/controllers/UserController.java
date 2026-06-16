@@ -58,11 +58,4 @@ public class UserController {
         dto = service.update(dto, id);
         return ResponseEntity.ok().body(dto);
     }
-
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }

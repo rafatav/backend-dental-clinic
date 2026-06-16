@@ -62,18 +62,6 @@ public class SpecialtyService {
 
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Recurso não encontrado");
-        }
-        try {
-            repository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new DatabaseException("Falha de integridade referencial");
-        }
-    }
-
     private void dtoToEntity(Specialty entity, SpecialtyDTO dto) {
         entity.setName(dto.getName());
         repository.save(entity);
