@@ -1,5 +1,6 @@
 package com.wise.dental_clinic.services;
 
+import com.wise.dental_clinic.dto.RoleDTO;
 import com.wise.dental_clinic.dto.UserDTO;
 import com.wise.dental_clinic.entities.Role;
 import com.wise.dental_clinic.entities.User;
@@ -93,6 +94,9 @@ public class UserService implements UserDetailsService {
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setLastLogin(dto.getLastLogin());
         entity.setActive(dto.getActive());
+        for (RoleDTO role : dto.getRoles()) {
+            entity.addRoles(new Role(role.getId(), role.getAuthority()));
+        }
     }
 
     @Override

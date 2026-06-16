@@ -1,10 +1,13 @@
 package com.wise.dental_clinic.dto;
 
+import com.wise.dental_clinic.entities.Role;
 import com.wise.dental_clinic.entities.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDTO {
 
@@ -26,6 +29,8 @@ public class UserDTO {
     private Instant createdAt;
     private Instant lastLogin;
     private Boolean active;
+
+    private List<RoleDTO> roles = new ArrayList<>();
 
     public UserDTO() {
     }
@@ -50,6 +55,9 @@ public class UserDTO {
         this.createdAt = entity.getCreatedAt();
         this.lastLogin = entity.getLastLogin();
         this.active = entity.getActive();
+        for (Role role : entity.getRoles()) {
+            this.roles.add(new RoleDTO(role));
+        }
     }
 
     public Long getId() {
@@ -82,5 +90,9 @@ public class UserDTO {
 
     public Boolean getActive() {
         return active;
+    }
+
+    public List<RoleDTO> getRoles() {
+        return roles;
     }
 }
