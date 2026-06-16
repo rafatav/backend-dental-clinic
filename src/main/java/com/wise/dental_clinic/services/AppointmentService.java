@@ -62,7 +62,7 @@ public class AppointmentService {
             }
         } else {
             if (name == null || name.isBlank()) {
-                result = repository.findByUser(loggedUser, pageable);
+                result = repository.findByDentistEmail(loggedUsername, pageable);
             } else {
                 result = repository.findByPatient_NameContainingIgnoreCaseAndUser(name, loggedUser, pageable);
             }
