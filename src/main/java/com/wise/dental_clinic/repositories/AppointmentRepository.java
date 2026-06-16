@@ -1,6 +1,7 @@
 package com.wise.dental_clinic.repositories;
 
 import com.wise.dental_clinic.entities.Appointment;
+import com.wise.dental_clinic.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                          @Param("endTime") LocalDateTime endTime);
 
     Page<Appointment> findByPatient_NameContainingIgnoreCase(String name, Pageable pageable);
+
+    Page<Appointment> findByUser(User user, Pageable pageable);
+
+    Page<Appointment> findByPatient_NameContainingIgnoreCaseAndUser(String name, User user, Pageable pageable);
 }

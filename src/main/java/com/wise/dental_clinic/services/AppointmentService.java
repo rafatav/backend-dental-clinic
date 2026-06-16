@@ -2,6 +2,7 @@ package com.wise.dental_clinic.services;
 
 import com.wise.dental_clinic.dto.AppointmentDTO;
 import com.wise.dental_clinic.entities.Appointment;
+import com.wise.dental_clinic.entities.AppointmentStatus;
 import com.wise.dental_clinic.entities.Dentist;
 import com.wise.dental_clinic.entities.Patient;
 import com.wise.dental_clinic.entities.User;
@@ -14,6 +15,9 @@ import com.wise.dental_clinic.services.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,11 +43,29 @@ public class AppointmentService {
 
     @Transactional(readOnly = true)
     public Page<AppointmentDTO> findAll(String name, Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String loggedUsername = jwt.getClaimAsString("username");
+
+        User loggedUser = userRepository.findByEmail(loggedUsername).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        boolean isAdmin = loggedUser.getRoles().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
         Page<Appointment> result;
-        if (name == null || name.isBlank()) {
-            result = repository.findAll(pageable);
+
+        if (isAdmin) {
+            if (name == null || name.isBlank()) {
+                result = repository.findAll(pageable);
+            } else {
+                result = repository.findByPatient_NameContainingIgnoreCase(name, pageable);
+            }
         } else {
-            result = repository.findByPatient_NameContainingIgnoreCase(name, pageable);
+            if (name == null || name.isBlank()) {
+                result = repository.findByUser(loggedUser, pageable);
+            } else {
+                result = repository.findByPatient_NameContainingIgnoreCaseAndUser(name, loggedUser, pageable);
+            }
         }
         return result.map(AppointmentDTO::new);
     }
@@ -57,6 +79,7 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO insert(AppointmentDTO dto) {
+        validateAppointmentTimes(dto.getStartTime(), dto.getEndTime());
         boolean hasConflict = repository.existsConflictingAppointment(
                 dto.getDentist().getId(),
                 dto.getStartTime(),
@@ -72,11 +95,12 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO update(AppointmentDTO dto, Long id) {
+        validateAppointmentTimes(dto.getStartTime(), dto.getEndTime());
         try {
             Optional<Appointment> result = repository.findById(id);
             Appointment entity = result.orElseThrow();
             dtoToEntity(entity, dto);
-            return new AppointmentDTO(entity);
+            return new AppointmentDTO(repository.save(entity));
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Recurso não encontrado");
         }
@@ -94,10 +118,26 @@ public class AppointmentService {
         }
     }
 
+    @Transactional
+    public void cancelAppointment(Long id, String cancellationReason) {
+        Appointment entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Consulta não encontrada"));
+        if (entity.getStatus() == AppointmentStatus.CANCELLED) {
+            throw new IllegalArgumentException("Esta consulta já está cancelada.");
+        }
+        entity.setStatus(AppointmentStatus.CANCELLED);
+        entity.setCancellationReason(cancellationReason);
+        repository.save(entity);
+    }
+
     private void dtoToEntity(Appointment entity, AppointmentDTO dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String loggedUsername = jwt.getClaimAsString("username");
+
         Patient patient = patientRepository.getReferenceById(dto.getPatient().getId());
         Dentist dentist = dentistRepository.getReferenceById(dto.getDentist().getId());
-        User user = userRepository.getReferenceById(dto.getUser().getId());
+        User user = userRepository.findByEmail(loggedUsername).orElseThrow(() -> new ResourceNotFoundException("Usuário logado não encontrado no banco"));
+
         entity.setPatient(patient);
         entity.setDentist(dentist);
         entity.setUser(user);
@@ -107,5 +147,11 @@ public class AppointmentService {
         entity.setEndTime(dto.getEndTime());
         entity.setBookedAt(dto.getBookedAt());
         entity.setStatus(dto.getStatus());
+    }
+
+    private void validateAppointmentTimes(java.time.LocalDateTime start, java.time.LocalDateTime end) {
+        if (start != null && end != null && !end.isAfter(start)) {
+            throw new IllegalArgumentException("Atenção: O horário final da consulta deve ser após o horário inicial.");
+        }
     }
 }
