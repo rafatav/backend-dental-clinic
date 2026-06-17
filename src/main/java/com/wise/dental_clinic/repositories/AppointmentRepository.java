@@ -27,4 +27,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Page<Appointment> findByDentistEmail(String email, Pageable pageable);
 
     Page<Appointment> findByPatient_NameContainingIgnoreCaseAndUser(String name, User user, Pageable pageable);
+
+    long countByUser(User user);
 }

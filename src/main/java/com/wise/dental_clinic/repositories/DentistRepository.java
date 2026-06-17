@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface DentistRepository extends JpaRepository<Dentist, Long> {
 
     Page<Dentist> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    long countByActiveTrue();
 }
