@@ -1,5 +1,6 @@
 package com.wise.dental_clinic.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wise.dental_clinic.entities.Role;
 import com.wise.dental_clinic.entities.User;
 import jakarta.validation.constraints.Email;
@@ -23,6 +24,7 @@ public class UserDTO {
     @Email(message = "Forneça um e-mail válido")
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(message = "Campo requerido")
     private String password;
 

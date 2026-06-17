@@ -62,7 +62,7 @@ public class AppointmentService {
             }
         } else {
             if (name == null || name.isBlank()) {
-                result = repository.findByUser(loggedUser, pageable);
+                result = repository.findByDentistEmail(loggedUsername, pageable);
             } else {
                 result = repository.findByPatient_NameContainingIgnoreCaseAndUser(name, loggedUser, pageable);
             }
@@ -103,18 +103,6 @@ public class AppointmentService {
             return new AppointmentDTO(repository.save(entity));
         } catch (NoSuchElementException e) {
             throw new ResourceNotFoundException("Recurso não encontrado");
-        }
-    }
-
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Recurso não encontrado");
-        }
-        try {
-            repository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new DatabaseException("Falha de integridade referencial");
         }
     }
 

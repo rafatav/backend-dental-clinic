@@ -58,11 +58,4 @@ public class SpecialtyController {
         dto = service.update(dto, id);
         return ResponseEntity.ok(dto);
     }
-
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DENTIST')")
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }
