@@ -16,19 +16,30 @@ Este é o repositório do back-end do sistema de Gestão de Consultas Odontológ
 ### Pré-requisitos
 * Java 21 instalado
 * Maven instalado
-* PostgreSQL rodando (localmente ou via Docker) com um banco de dados criado (ex: `dental_clinic_db`).
+* Docker* e *Docker Compose* instalados
 
-### Passos para Execução
-1.  Clone este repositório.
-2.  Abra o projeto na sua IDE (IntelliJ, Eclipse, VS Code).
-3.  Configure as variáveis de ambiente no arquivo `application.properties` (ou `.yml`) com as credenciais do seu banco de dados PostgreSQL. Exemplo:
-    ```properties
-    spring.datasource.url=jdbc:postgresql://localhost:5432/dental_clinic_db
-    spring.datasource.username=seu_usuario
-    spring.datasource.password=sua_senha
-    ```
-4.  Execute a aplicação. O Spring Boot irá inicializar as tabelas no banco de dados automaticamente.
-5.  A API estará disponível em `http://localhost:8080`.
+### 1. Subindo o Banco de Dados com Docker
+O projeto já conta com um arquivo `docker-compose.yml` pré-configurado com o PostgreSQL e o pgAdmin (interface gráfica para gerenciar o banco).
+
+Na raiz do projeto, execute o comando abaixo para baixar as imagens e iniciar os containers em segundo plano:
+
+``docker compose up -d``
+
+### 2. Configurando a Aplicação
+Certifique-se de que o arquivo src/main/resources/application.properties (ou .yml) esteja configurado com as credenciais definidas no Docker:
+
+Properties:
+``spring.datasource.url=jdbc:postgresql://localhost:5432/dental_clinic_db``
+``spring.datasource.username=docker``
+``spring.datasource.password=docker``
+``spring.jpa.hibernate.ddl-auto=update``
+
+### 3. Executando a API
+Abra o projeto na sua IDE e execute a classe principal, ou rode o seguinte comando Maven no terminal:
+
+Bash
+mvn spring-boot:run
+A API estará disponível em http://localhost:8080.
 
 ## Documentação dos Endpoints (API)
 
